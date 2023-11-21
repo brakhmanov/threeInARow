@@ -1,161 +1,144 @@
-import java.util.*;
+import java.util.Random;
+import java.util.Scanner;
 
-public class Main {
-    // Player and cpu positions in array list
-    static ArrayList<Integer> playerPositions = new ArrayList<Integer>();
-    static ArrayList<Integer> cpuPositions = new ArrayList<Integer>();
+public class Main{
+    private static int yourWins = 0;
+    private static int computerWins = 0;
+    private static int otherPlayerWins = 0;
+
     public static void main(String[] args) {
+        boolean playAgain = true;
+        String player2name;
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("What is your name? ");
+        String player1name = scanner.nextLine();
 
-        // Create 2D array for our board
-        char[][] gameBoard = {{' ', '|', ' ', '|', ' '},
-                {'-', '+', '-', '+', '-'},
-                {' ', '|', ' ', '|', ' '},
-                {'-', '+', '-', '+', '-'},
-                {' ', '|', ' ', '|', ' '}};
+        while (playAgain) {
+            Board board_object = new Board ();
+            char[][] array_board = board_object.getBoard();
+            //Instance board
+            boolean opponent = chooseOpponent(scanner);
 
-        // Call printGameBoard method
-        printGameBoard(gameBoard);
+            if (opponent) {//If opponent = true, then player wants to play against other player
+                System.out.println("What is the other player's name? ");
+                player2name = scanner.nextLine();
+                System.out.println("Hello to the other player " + player2name);
+                playAgainstAnotherPlayer(array_board, scanner, player1name, player2name);
+            } else {
+                playAgainstComputer(array_board, scanner, player1name);
+            }
+            System.out.println("Want to play again? y/n");
+            String answer = scanner.nextLine();
+            if (answer.equalsIgnoreCase("y")) {
+                System.out.println("Lets do another round!");
+            } else if (answer.equalsIgnoreCase("n")) {
+                if (opponent) {
+                    System.out.println(player1name + " won " + yourWins + " times and the other player(s) won " + otherPlayerWins + " times.");
+                } else {
+                    System.out.println("Computer won " + computerWins + " times, and " + player1name + " won " + yourWins + " times.");
+                }
 
-
-        // Game loop
+                playAgain = false;
+            } else {
+                System.out.println("Invalid input");
+            }
+        }
+    }
+    private static void playAgainstComputer(char[][] array_board, Scanner scanner, String input_name) {
+        String quickFix = "";
         while (true) {
-            Scanner scan = new Scanner(System.in);
-
-            // Ask player to choose position to place X or O
-            System.out.println("Choose position (1-9): ");
-            int playerPos = scan.nextInt();
-
-            // Check that position is valid and not already taken
-            while(playerPositions.contains(playerPos) || cpuPositions.contains(playerPositions)) {
-                System.out.println("This position is taken. Enter a correct position!");
-                playerPos = scan.nextInt();
-            }
-
-            // Calling placePiece method for player to place X
-            placePiece(gameBoard, playerPos, "player");
-
-            String result = checkWinner();
-            if(result.length() > 0 ) {
-                System.out.println(result);
+            yourTurn(array_board, scanner, input_name);//sending in scanner object and the board
+            if (Board.isGameFinished(array_board, input_name, quickFix)) {
+                yourWins++;
                 break;
             }
+            Board.printBoard(array_board);
+            computerTurn(array_board);
 
-            // Same method but with Random for computer to place O
-            Random rand = new Random();
-            int cpuPos = rand.nextInt(9) + 1;
-            while(playerPositions.contains(cpuPos) || cpuPositions.contains(cpuPos)) {
-                cpuPos = rand.nextInt(9) + 1;
-            }
-            placePiece(gameBoard, cpuPos, "cpu");
-
-            // Print game board with X that changed position
-            printGameBoard(gameBoard);
-
-            // Check the winner
-            result = checkWinner();
-            if(result.length() > 0 ) {
-                System.out.println(result);
+            if (Board.isGameFinished(array_board, input_name, quickFix)) {
+                computerWins++;
                 break;
             }
+            Board.printBoard(array_board);
         }
     }
+    private static void playAgainstAnotherPlayer(char[][] array_board, Scanner scanner, String input_name, String other_name) {
 
-    // Create the method to print game board
-    public static void printGameBoard(char[][] gameBoard) {
-        // Print out the game board using 2 nested loops
-        for (char[] row : gameBoard) {
-            for (char c : row) {
-                System.out.print(c);
+
+        while (true) {
+            yourTurn(array_board, scanner, input_name);//sending in scanner object and the board
+            if (Board.isGameFinished(array_board, input_name, other_name)) {
+                yourWins++;
+                break;
             }
-            System.out.println();
+            Board.printBoard(array_board);
+            otherPlayerTurn(array_board, scanner, other_name);
+
+            if (Board.isGameFinished(array_board, input_name, other_name)) {
+                otherPlayerWins++;
+                break;
+            }
+            Board.printBoard(array_board);
         }
     }
+    private static void otherPlayerTurn(char[][] array_board, Scanner scanner, String other_name) { //lets the other player move their piece
+        System.out.println("It is " + other_name + "s turn.");
+        String userInput;
+        while (true) {
+            System.out.println("Where do you want to put your piece (1-9)");
+            userInput = scanner.nextLine();
 
-    // Create own method for placing the X to reuse later
-    public static void placePiece(char[][] gameBoard, int pos, String user) {
-
-        // Variable to set (X or O)
-        char symbol = ' ';
-
-        // If playing against computer set the variable to O
-        if (user.equals("player")) {
-            symbol = 'X';
-            playerPositions.add(pos);
-        } else if (user.equals("cpu")) {
-            symbol = 'O';
-            cpuPositions.add(pos);
+            if (Board.isSpaceAvailable(array_board, userInput)) {
+                break;
+            } else {
+                System.out.println(userInput + "; this is not a valid move! ");
+            }
         }
+        Board.placingPiece(array_board, userInput, 'Z');
+    }
+    private static boolean chooseOpponent(Scanner scanner) {
+        System.out.println("Choose your opponent by pressing 1 or 2: \n" + "1. Another player\n" + "2. Computer");
+        String choice = scanner.nextLine();
 
-        // Change space character with X or O (symbol) with switch loop
-        switch (pos) {
-            case 1:
-                gameBoard[0][0] = symbol;
-                break;
-            case 2:
-                gameBoard[0][2] = symbol;
-                break;
-            case 3:
-                gameBoard[0][4] = symbol;
-                break;
-            case 4:
-                gameBoard[2][0] = symbol;
-                break;
-            case 5:
-                gameBoard[2][2] = symbol;
-                break;
-            case 6:
-                gameBoard[2][4] = symbol;
-                break;
-            case 7:
-                gameBoard[4][0] = symbol;
-                break;
-            case 8:
-                gameBoard[4][2] = symbol;
-                break;
-            case 9:
-                gameBoard[4][4] = symbol;
-                break;
+
+        switch (choice) {
+            case "1":
+                System.out.println("You chose another player!");
+                return true; //True for player
+            case "2":
+                System.out.println("You choose computer player!");
+                return false; //False for computer
             default:
-                break;
+                System.out.println("Wrong input, you will now play against computer.");
         }
+        return false;
     }
+    private static void computerTurn(char[][] array_board) { //Handles computers turn
+        Random rand = new Random();
+        int computerMovePos;
 
-    // Check winner method
-    public static String checkWinner() {
-
-        // Row checker for every row with help of list
-        List topRow = Arrays.asList(1, 2, 3);
-        List midRow = Arrays.asList(4, 5, 6);
-        List botRow = Arrays.asList(7, 8, 9);
-        // Row checker for columns
-        List leftCol = Arrays.asList(1, 4, 7);
-        List midCol = Arrays.asList(2, 5, 8);
-        List rightCol = Arrays.asList(3, 6, 9);
-        // Diagonals checker
-        List cross1 = Arrays.asList(1, 5, 9);
-        List cross2 = Arrays.asList(7, 5, 3);
-
-        List<List> winConditions = new ArrayList<>();
-        winConditions.add(topRow);
-        winConditions.add(midRow);
-        winConditions.add(botRow);
-        winConditions.add(leftCol);
-        winConditions.add(midCol);
-        winConditions.add(rightCol);
-        winConditions.add(cross1);
-        winConditions.add(cross2);
-
-        for(List l : winConditions) {
-            if(playerPositions.containsAll(l)) {
-                return "Congratulations! YOU WON!";
-            } else if (cpuPositions.containsAll(l)) {
-                return "You lost. Game over :(";
-            } else if (playerPositions.size() + cpuPositions.size() == 9) {
-                return "No one wins. It is a tie. ";
+        while (true) {
+            computerMovePos = rand.nextInt(9) + 1;  //random int between 0-8, then we add + 1
+            if (Board.isSpaceAvailable(array_board, Integer.toString(computerMovePos))) {//Breaks out of loop when valid place is found
+                break;
             }
         }
+        System.out.println("Computer choose " + computerMovePos);
+        Board.placingPiece(array_board, Integer.toString(computerMovePos), 'O');
+    }
+    private static void yourTurn(char[][] array_board, Scanner scanner, String input_name) {//Handles my turn
+        System.out.println("It is " + input_name + "s turn.");
+        String userInput;
+        while (true) {
+            System.out.println("Where do you want to put your piece (1-9)");
+            userInput = scanner.nextLine();
 
-
-        return "";
+            if (Board.isSpaceAvailable(array_board, userInput)) {
+                break;
+            } else {
+                System.out.println(userInput + "; this is not a valid move! ");
+            }
+        }
+        Board.placingPiece(array_board, userInput, 'X');
     }
 }
