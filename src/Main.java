@@ -1,7 +1,7 @@
 import java.util.Random;
 import java.util.Scanner;
 
-public class Main{
+public class Main {
     private static int yourWins = 0;
     private static int computerWins = 0;
     private static int otherPlayerWins = 0;
@@ -14,7 +14,7 @@ public class Main{
         String player1name = scanner.nextLine();
 
         while (playAgain) {
-            Board board_object = new Board ();
+            Board board_object = new Board();
             char[][] array_board = board_object.getBoard();
             //Instance board
             boolean opponent = chooseOpponent(scanner);
@@ -44,6 +44,7 @@ public class Main{
             }
         }
     }
+
     private static void playAgainstComputer(char[][] array_board, Scanner scanner, String input_name) {
         String quickFix = "";
         while (true) {
@@ -62,6 +63,7 @@ public class Main{
             Board.printBoard(array_board);
         }
     }
+
     private static void playAgainstAnotherPlayer(char[][] array_board, Scanner scanner, String input_name, String other_name) {
 
 
@@ -81,6 +83,7 @@ public class Main{
             Board.printBoard(array_board);
         }
     }
+
     private static void otherPlayerTurn(char[][] array_board, Scanner scanner, String other_name) { //lets the other player move their piece
         System.out.println("It is " + other_name + "s turn.");
         String userInput;
@@ -96,6 +99,7 @@ public class Main{
         }
         Board.placingPiece(array_board, userInput, 'Z');
     }
+
     private static boolean chooseOpponent(Scanner scanner) {
         System.out.println("Choose your opponent by pressing 1 or 2: \n" + "1. Another player\n" + "2. Computer");
         String choice = scanner.nextLine();
@@ -113,6 +117,7 @@ public class Main{
         }
         return false;
     }
+
     private static void computerTurn(char[][] array_board) { //Handles computers turn
         Random rand = new Random();
         int computerMovePos;
@@ -126,6 +131,7 @@ public class Main{
         System.out.println("Computer choose " + computerMovePos);
         Board.placingPiece(array_board, Integer.toString(computerMovePos), 'O');
     }
+
     private static void yourTurn(char[][] array_board, Scanner scanner, String input_name) {//Handles my turn
         System.out.println("It is " + input_name + "s turn.");
         String userInput;

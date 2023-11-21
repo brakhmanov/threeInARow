@@ -2,6 +2,7 @@ public class Board {
     private static char[][] Board;
 
     public Board() {
+        // Constructor
         Board = new char[][]{
                 {' ', ' ', ' '},
                 {' ', ' ', ' '},
@@ -23,7 +24,7 @@ public class Board {
     }
 
     public static boolean isSpaceAvailable(char[][] board, String position) {
-        // Checker is space is blank
+        // Checker if space is blank
         switch (position) {
             case "1":
                 return (board[0][0] == ' '); // If the board at place [][] is empty (' '), return true, else false
@@ -82,6 +83,7 @@ public class Board {
                 System.out.println("You entered wrong value");
         }
     }
+
 
     public static boolean isGameFinished(char[][] board, String player1name, String player2name) {
         // Check if three in a row
