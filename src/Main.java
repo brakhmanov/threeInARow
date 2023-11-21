@@ -1,3 +1,4 @@
+import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
@@ -17,9 +18,15 @@ public class Main {
         Scanner scan = new Scanner(System.in);
         // Ask player to choose position to place X or O
         System.out.println("Choose position (1-9): ");
-        int pos = scan.nextInt();
-        System.out.println(pos);
+        int playerPos = scan.nextInt();
 
+        // Calling placePiece method for player to place X
+        placePiece(gameBoard, playerPos, "player");
+
+        // Same method but with Random for computer to place O
+        Random rand = new Random();
+        int cpuPos = rand.nextInt(9) + 1;
+        placePiece(gameBoard, cpuPos, "cpu");
 
         // Print game board with X that changed position
         printGameBoard(gameBoard);
@@ -39,8 +46,10 @@ public class Main {
     // Create own method for placing the X to reuse later
     public static void placePiece(char[][] gameBoard, int pos, String user) {
 
-        char symbol = 'X';
+        // Variable to set (X or O)
+        char symbol = ' ';
 
+        // If playing against computer set the variable to O
         if(user.equals("player")) {
             symbol = 'X';
         } else if (user.equals("cpu")) {
@@ -48,7 +57,7 @@ public class Main {
 
         }
 
-        // Change space character with X or O with switch loop
+        // Change space character with X or O (symbol) with switch loop
         switch (pos) {
             case 1:
                 gameBoard[0][0] = symbol;
@@ -76,6 +85,8 @@ public class Main {
                 break;
             case 9:
                 gameBoard[4][4] = symbol;
+                break;
+            default:
                 break;
         }
     }
