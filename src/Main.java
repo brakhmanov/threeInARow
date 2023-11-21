@@ -25,20 +25,38 @@ public class Main {
             System.out.println("Choose position (1-9): ");
             int playerPos = scan.nextInt();
 
+            // Check that position is valid and not already taken
+            while(playerPositions.contains(playerPos) || cpuPositions.contains(playerPositions)) {
+                System.out.println("This position is taken. Enter a correct position!");
+                playerPos = scan.nextInt();
+            }
+
             // Calling placePiece method for player to place X
             placePiece(gameBoard, playerPos, "player");
+
+            String result = checkWinner();
+            if(result.length() > 0 ) {
+                System.out.println(result);
+                break;
+            }
 
             // Same method but with Random for computer to place O
             Random rand = new Random();
             int cpuPos = rand.nextInt(9) + 1;
+            while(playerPositions.contains(cpuPos) || cpuPositions.contains(cpuPos)) {
+                cpuPos = rand.nextInt(9) + 1;
+            }
             placePiece(gameBoard, cpuPos, "cpu");
 
             // Print game board with X that changed position
             printGameBoard(gameBoard);
 
             // Check the winner
-            String result = checkWinner();
-            System.out.println(result);
+            result = checkWinner();
+            if(result.length() > 0 ) {
+                System.out.println(result);
+                break;
+            }
         }
     }
 
